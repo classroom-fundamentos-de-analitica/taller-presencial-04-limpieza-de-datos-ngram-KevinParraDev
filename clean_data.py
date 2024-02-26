@@ -37,14 +37,17 @@ def generate_cleaned_column(df):
 
     df = df.copy()
 
-    # 1. Ordene el dataframe por 'key' y 'text'
-    df = df.sort_values(by=["key", "text"]).copy()
-    # 2. Seleccione la primera fila de cada grupo de 'key'
-    keys = df.groupby("key").first().reset_index()
-    # 3.  Cree un diccionario con 'key' como clave y 'text' como valor
-    keys = keys.set_index("key")["text"].to_dict()
-    # 4. Cree la columna 'cleaned' usando el diccionario
-    df["cleaned"] = df["key"].map(keys)
+    # Ordene el dataframe por 'key' y 'text'
+    df = df.sort_values(by=["key", "text"], ascending=[True, True])
+
+    # Seleccione la primera fila de cada grupo de 'key'
+    keys = df.drop_duplicates(subset="key", keep="first")
+
+    # Cree un diccionario con 'key' como clave y 'text' como valor
+    key_dict = dict(zip(keys["key"], keys["text"]))
+
+    # Cree la columna 'cleaned' usando el diccionario
+    df["cleaned"] = df["key"].map(key_dict)
 
     return df
 
