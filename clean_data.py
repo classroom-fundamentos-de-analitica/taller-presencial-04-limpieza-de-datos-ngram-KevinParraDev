@@ -5,6 +5,8 @@ import pandas as pd
 
 def load_data(input_file):
     """Lea el archivo usando pandas y devuelva un DataFrame"""
+    data = pd.read_csv(input_file, sep="\t")
+    return data
 
 
 def create_key(df, n):
@@ -17,11 +19,16 @@ def create_key(df, n):
     # Convierta el texto a minúsculas
     # Transforme palabras que pueden (o no) contener guiones por su version sin guion.
     # Remueva puntuación y caracteres de control
+    df["fingerprint"] = df["fingerprint"].str.strip().str.lower().str.replace("-", "").str.replace(".", "").str.translate(
+           str.maketrans("", "", "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
+        )
     # Convierta el texto a una lista de tokens
     # Una el texto sin espacios en blanco
     # Convierta el texto a una lista de n-gramas
     # Ordene la lista de n-gramas y remueve duplicados
+    df["fingerprint"] = df["fingerprint"].str.split().str.join().apply(lambda x: [x[i:i+n] for i in range(len(x) -n +1)])
     # Convierta la lista de ngramas a una cadena
+    df["fingerprint"] = df["fingerprint"].apply(lambda x: sorted(set(x))).str.join(" ")
     
     return df
 
