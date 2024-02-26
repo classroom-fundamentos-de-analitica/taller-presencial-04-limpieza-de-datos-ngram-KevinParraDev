@@ -18,16 +18,16 @@ def create_key(df, n):
     # Convierta el texto a minúsculas
     # Transforme palabras que pueden (o no) contener guiones por su version sin guion.
     # Remueva puntuación y caracteres de control
-    df["fingerprint"] = df["fingerprint"].str.strip().str.lower().str.replace("-", "").str.replace(".", "").str.translate(
+    df["key"] = df["key"].str.strip().str.lower().str.replace("-", "").str.replace(".", "").str.translate(
            str.maketrans("", "", "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
         )
     # Convierta el texto a una lista de tokens
     # Una el texto sin espacios en blanco
     # Convierta el texto a una lista de n-gramas
     # Ordene la lista de n-gramas y remueve duplicados
-    df["fingerprint"] = df["fingerprint"].str.split().str.join().apply(lambda x: [x[i:i+n] for i in range(len(x) -n +1)])
+    df["key"] = df["key"].str.split().str.join().apply(lambda x: [x[i:i+n] for i in range(len(x) -n +1)])
     # Convierta la lista de ngramas a una cadena
-    df["fingerprint"] = df["fingerprint"].apply(lambda x: sorted(set(x))).str.join(" ")
+    df["key"] = df["key"].apply(lambda x: sorted(set(x))).str.join("")
     
     return df
 
@@ -37,14 +37,14 @@ def generate_cleaned_column(df):
 
     df = df.copy()
 
-    # 1. Ordene el dataframe por 'fingerprint' y 'text'
-    df = df.sort_values(by=["fingerprint", "text"]).copy()
-    # 2. Seleccione la primera fila de cada grupo de 'fingerprint'
-    fingerprints = df.groupby("fingerprint").first().reset_index()
-    # 3.  Cree un diccionario con 'fingerprint' como clave y 'text' como valor
-    fingerprints = fingerprints.set_index("fingerprint")["text"].to_dict()
+    # 1. Ordene el dataframe por 'key' y 'text'
+    df = df.sort_values(by=["key", "text"]).copy()
+    # 2. Seleccione la primera fila de cada grupo de 'key'
+    keys = df.groupby("key").first().reset_index()
+    # 3.  Cree un diccionario con 'key' como clave y 'text' como valor
+    keys = keys.set_index("key")["text"].to_dict()
     # 4. Cree la columna 'cleaned' usando el diccionario
-    df["cleaned"] = df["fingerprint"].map(fingerprints)
+    df["cleaned"] = df["key"].map(keys)
 
     return df
 
