@@ -13,7 +13,6 @@ def create_key(df, n):
     """Cree una nueva columna en el DataFrame que contenga el key de la columna 'text'"""
 
     df = df.copy()
-
     # Copie la columna 'text' a la columna 'key'
     # Remueva los espacios en blanco al principio y al final de la cadena
     # Convierta el texto a minúsculas
