@@ -1,3 +1,5 @@
+
+ 
 """Taller evaluable presencial"""
 
 import pandas as pd
@@ -5,30 +7,48 @@ import pandas as pd
 
 def load_data(input_file):
     """Lea el archivo usando pandas y devuelva un DataFrame"""
-    data = pd.read_csv(input_file, sep="\t")
-    return data
+
+    df = pd.read_csv(input_file)
+    return df
 
 
 def create_key(df, n):
     """Cree una nueva columna en el DataFrame que contenga el key de la columna 'text'"""
 
     df = df.copy()
+
     # Copie la columna 'text' a la columna 'key'
+    df["key"] = df["text"]
+
     # Remueva los espacios en blanco al principio y al final de la cadena
+    df["key"] = df["key"].str.strip()
+
     # Convierta el texto a minúsculas
+    df["key"] = df["key"].str.lower()
+
     # Transforme palabras que pueden (o no) contener guiones por su version sin guion.
+    df["key"] = df["key"].str.replace("-", "")
+
     # Remueva puntuación y caracteres de control
-    df["key"] = df["key"].str.strip().str.lower().str.replace("-", "").str.replace(".", "").str.translate(
-           str.maketrans("", "", "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
-        )
+    df["key"] = df["key"].str.translate(
+    str.maketrans("", "", "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
+    )
+
     # Convierta el texto a una lista de tokens
+    df["key"] = df["key"].str.split()
+
     # Una el texto sin espacios en blanco
+    df["key"] = df["key"].str.join("")
+
     # Convierta el texto a una lista de n-gramas
+    df["key"] = df["key"].map(lambda x: [x[t:t+n-1] for t in range(len(x))])
+
     # Ordene la lista de n-gramas y remueve duplicados
-    df["key"] = df["key"].str.split().str.join().apply(lambda x: [x[i:i+n] for i in range(len(x) -n +1)])
+    df["key"] = df["key"].apply(lambda x: sorted(set(x)))
+
     # Convierta la lista de ngramas a una cadena
-    df["key"] = df["key"].apply(lambda x: sorted(set(x))).str.join("")
-    
+    df["key"] = df["key"].str.join("")
+
     return df
 
 
