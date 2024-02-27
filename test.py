@@ -1,5 +1,4 @@
 """GitHub Classroom autograding script."""
-
 import os
 
 import clean_data
